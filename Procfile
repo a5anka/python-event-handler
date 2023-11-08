@@ -1,1 +1,1 @@
-worker: python order_processor.py
+web: python order_processor.py
