@@ -1,6 +1,7 @@
 import time
 import threading
 from random import randint, choice
+import logging
 
 # Event class
 class Event:
@@ -32,11 +33,13 @@ class EventHandler(threading.Thread):
         self.handlers[event_type].append(handler)
 
     def run(self):
+        polling_interval = int(os.getenv('POLLING_INTERVAL', 1))  # Default to 1 second if not set
+        logging.info(f"Polling interval set to {polling_interval} seconds.")
         while True:
             event = self.service.get_event()
             if event:
                 self.dispatch(event)
-            time.sleep(1)  # Polling interval
+            time.sleep(polling_interval)  # Polling interval
 
     def dispatch(self, event):
         if event.type in self.handlers:
@@ -55,6 +58,7 @@ def handle_delete_order(order_data):
 
 # Setup and run the event handler
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     service = MockExternalService()
     event_handler = EventHandler(service)
 
